@@ -52,6 +52,7 @@ qz74QLY/dgK9GeSZz35vElI0EIRXsknqkh0vpFRLHfwIa7KjLHVErfaLtsSUyZoi
 
 
 class TestEnvironment(str, enum.Enum):
+    __test__ = False
     LOCAL = "local"
     SANDBOX = "sandbox"
 

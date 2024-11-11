@@ -18,7 +18,7 @@ class InquiryRequest(BaseRequest):
     amount: Optional[int] = field(default=None)
     id: Optional[str] = field(default=None)
     fields: Optional[List[Field]] = field(default=None)
-
+    downline_id: Optional[str] = field(default=None)
     type: str = field(default="inquiry", init=False)
 
 

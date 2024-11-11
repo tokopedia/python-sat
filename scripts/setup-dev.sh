@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Installing development dependency"
-pip install -U tox tox-pip-version tox-pyenv-redux
+pip install -U tox 
 pip install -U sphinx myst-parser sphinx-rtd-theme twine
 
 
@@ -19,7 +19,7 @@ done
 echo "Python installation check completed."
 
 echo "Installing development dependencies"
-tox --devenv .venv
+tox -e py38 --devenv .venv
 echo "Finished installing development dependencies."
 
 

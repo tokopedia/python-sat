@@ -227,3 +227,104 @@ def test_inquiry_s00(
     assert response.get_error_codes() == "S00"
     assert response.get_error_statuses() == "500"
     assert response.get_error_details() == "Internal Server Error"
+
+
+def test_inquiry_success_downline_id(
+    make_httpserver: HTTPServer,
+    sat_client: SATClient,
+):
+    """
+    Example of inquiry endpoint success
+
+    :param make_httpserver:
+    :param sat_client:
+    """
+    make_httpserver.expect_request(
+        INQUIRY_PATH,
+        method="POST",
+        headers={
+            "content-type": "application/json",
+            "authorization": "Bearer testingToken",
+            "X-Sat-Sdk-Version": SDK_LABEL,
+        },
+        json={
+            "data": {
+                "type": "inquiry",
+                "attributes": {
+                    "product_code": "pln-postpaid",
+                    "client_number": "111111111111",
+                    "fields": [{"name": "optional", "value": "optional"}],
+                    "downline_id": "client-123",
+                },
+            }
+        },
+        handler_type=HandlerType.ONESHOT,
+    ).respond_with_json(
+        response_json={
+            "data": {
+                "type": "inquiry",
+                "id": "2121212",
+                "attributes": {
+                    "admin_fee": 2500,
+                    "base_price": 25000,
+                    "client_name": "TOKOPXXXX UXX",
+                    "client_number": "2121212",
+                    "fields": [{"name": "optional", "value": "optional"}],
+                    "inquiry_result": [
+                        {"name": "ID Pelanggan", "value": "2121212"},
+                        {"name": "Nama", "value": "TOKOPXXXX UXX"},
+                        {"name": "Total Bayar", "value": "Rp 27.500"},
+                        {"name": "IDPEL", "value": "2121212"},
+                        {"name": "NAMA", "value": "Tokopedia User Default"},
+                        {"name": "TOTAL TAGIHAN", "value": "1 BULAN"},
+                        {"name": "BL/TH", "value": "MAR20"},
+                        {"name": "RP TAG PLN", "value": "Rp 25.000"},
+                        {"name": "ADMIN BANK", "value": "Rp 2.500"},
+                        {"name": "TOTAL BAYAR", "value": "Rp 27.500"},
+                    ],
+                    "meter_id": "2121212",
+                    "product_code": "pln-postpaid",
+                    "sales_price": 27500,
+                },
+            }
+        },
+        status=200,
+        headers={"Content-Type": "application/json"},
+    )
+
+    response = sat_client.inquiry(
+        req=InquiryRequest(
+            product_code="pln-postpaid",
+            client_number="111111111111",
+            fields=[Field(name="optional", value="optional")],
+            downline_id="client-123",
+        )
+    )
+
+    assert response.is_success()
+    assert response == InquiryResponse(
+        id="2121212",
+        product_code="pln-postpaid",
+        sales_price=27500,
+        fields=[Field(name="optional", value="optional")],
+        inquiry_result=[
+            Field(name="ID Pelanggan", value="2121212"),
+            Field(name="Nama", value="TOKOPXXXX UXX"),
+            Field(name="Total Bayar", value="Rp 27.500"),
+            Field(name="IDPEL", value="2121212"),
+            Field(name="NAMA", value="Tokopedia User Default"),
+            Field(name="TOTAL TAGIHAN", value="1 BULAN"),
+            Field(name="BL/TH", value="MAR20"),
+            Field(name="RP TAG PLN", value="Rp 25.000"),
+            Field(name="ADMIN BANK", value="Rp 2.500"),
+            Field(name="TOTAL BAYAR", value="Rp 27.500"),
+        ],
+        base_price=25000,
+        admin_fee=2500,
+        client_name="TOKOPXXXX UXX",
+        client_number="2121212",
+        meter_id="2121212",
+        ref_id="",
+        max_payment=0,
+        min_payment=0,
+    )
