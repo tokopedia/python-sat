@@ -1,6 +1,6 @@
 # Makefile for building and uploading a Python package
 
-.PHONY: clean build upload docs new-version
+.PHONY: clean build upload new-version
 
 # Python binary to use
 PYTHON := python3
@@ -12,14 +12,6 @@ test:
 # Setup dev environment
 setup-dev:
 	./scripts/setup-dev.sh
-
-# Target to build the documentation (requires Sphinx)
-docs:
-	sphinx-apidoc -o docs py_sat && cd docs && make html
-
-# Serve docs
-serve-docs:
-	python -m http.server --directory docs/_build/html 32843
 
 # Target to upload the package to PyPI (requires Twine)
 upload:
@@ -33,8 +25,7 @@ clean:
 build:
 	$(PYTHON) setup.py sdist
 
-
 # Target to upload the package to PyPI with new version
 new-version:
-	make clean && make build && make docs && make upload
+	make clean && make build  && make upload
 
