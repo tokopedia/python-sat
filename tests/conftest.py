@@ -1,4 +1,5 @@
 import enum
+import logging
 import os
 import random
 import string
@@ -123,8 +124,10 @@ def __construct_sandbox_test_config():
 @pytest.fixture(scope="session")
 def sat_config(make_httpserver: HTTPServer, env: TestEnvironment):
     if env == TestEnvironment.LOCAL:
+        logging.info("Using local test config")
         return __construct_local_test_config(make_httpserver)
     elif env == TestEnvironment.SANDBOX:
+        logging.info("Using sandbox test config")
         return __construct_sandbox_test_config()
     else:
         raise ValueError(f"Invalid environment: {env}")

@@ -263,18 +263,18 @@ def test_inquiry_success_downline_id(
         response_json={
             "data": {
                 "type": "inquiry",
-                "id": "2121212",
+                "id": "111111111111",
                 "attributes": {
                     "admin_fee": 2500,
                     "base_price": 25000,
                     "client_name": "TOKOPXXXX UXX",
-                    "client_number": "2121212",
+                    "client_number": "111111111111",
                     "fields": [{"name": "optional", "value": "optional"}],
                     "inquiry_result": [
-                        {"name": "ID Pelanggan", "value": "2121212"},
+                        {"name": "ID Pelanggan", "value": "111111111111"},
                         {"name": "Nama", "value": "TOKOPXXXX UXX"},
                         {"name": "Total Bayar", "value": "Rp 27.500"},
-                        {"name": "IDPEL", "value": "2121212"},
+                        {"name": "IDPEL", "value": "111111111111"},
                         {"name": "NAMA", "value": "Tokopedia User Default"},
                         {"name": "TOTAL TAGIHAN", "value": "1 BULAN"},
                         {"name": "BL/TH", "value": "MAR20"},
@@ -282,7 +282,7 @@ def test_inquiry_success_downline_id(
                         {"name": "ADMIN BANK", "value": "Rp 2.500"},
                         {"name": "TOTAL BAYAR", "value": "Rp 27.500"},
                     ],
-                    "meter_id": "2121212",
+                    "meter_id": "111111111111",
                     "product_code": "pln-postpaid",
                     "sales_price": 27500,
                 },
@@ -303,15 +303,15 @@ def test_inquiry_success_downline_id(
 
     assert response.is_success()
     assert response == InquiryResponse(
-        id="2121212",
+        id="111111111111",
         product_code="pln-postpaid",
         sales_price=27500,
         fields=[Field(name="optional", value="optional")],
         inquiry_result=[
-            Field(name="ID Pelanggan", value="2121212"),
+            Field(name="ID Pelanggan", value="111111111111"),
             Field(name="Nama", value="TOKOPXXXX UXX"),
             Field(name="Total Bayar", value="Rp 27.500"),
-            Field(name="IDPEL", value="2121212"),
+            Field(name="IDPEL", value="111111111111"),
             Field(name="NAMA", value="Tokopedia User Default"),
             Field(name="TOTAL TAGIHAN", value="1 BULAN"),
             Field(name="BL/TH", value="MAR20"),
@@ -322,8 +322,8 @@ def test_inquiry_success_downline_id(
         base_price=25000,
         admin_fee=2500,
         client_name="TOKOPXXXX UXX",
-        client_number="2121212",
-        meter_id="2121212",
+        client_number="111111111111",
+        meter_id="111111111111",
         ref_id="",
         max_payment=0,
         min_payment=0,
