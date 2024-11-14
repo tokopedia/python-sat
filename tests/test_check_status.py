@@ -17,6 +17,7 @@ from py_sat import SATClient
 from py_sat.constant import CHECK_STATUS_PATH, CHECKOUT_PATH, SDK_LABEL
 from py_sat.models import (ErrorObject, ErrorResponse, Field, OrderDetail,
                            OrderRequest)
+from py_sat.signature import Signature
 from py_sat.utils import generate_json_api_request
 
 
@@ -24,6 +25,7 @@ def test_check_status_success(
     make_httpserver: HTTPServer,
     sat_client: SATClient,
     util: TestUtil,
+    sat_signer: Signature,
 ):
     """
     Test check status success
@@ -42,8 +44,6 @@ def test_check_status_success(
         amount=3500,
     )
     body = generate_json_api_request(req.to_dict())
-    body_str = json.dumps(body)
-    signature = sat_client.signature.sign(body_str)
 
     make_httpserver.expect_request(
         CHECKOUT_PATH,
@@ -86,8 +86,6 @@ def test_check_status_success(
         headers={"Content-Type": "application/json"},
     )
 
-    assert sat_client.signature.verify(body_str, signature)
-
     response = sat_client.checkout(req)
 
     assert response.is_success()
@@ -103,6 +101,40 @@ def test_check_status_success(
         id=random_string,
     )
 
+    body = {
+        "data": {
+            "type": "order",
+            "id": random_string,
+            "attributes": {
+                "admin_fee": 2500,
+                "client_name": "Tokopedia User Default",
+                "client_number": random_client_id,
+                "error_code": "",
+                "error_detail": "",
+                "fields": None,
+                "fulfilled_at": datetime.datetime.now(
+                    tz=datetime.timezone.utc
+                ).isoformat(),
+                "fulfillment_result": [
+                    {"name": "Nomor Referensi", "value": "174298636"},
+                    {"name": "Nama Pelanggan", "value": "Tokopedia User Default"},
+                    {"name": "Nomor Pelanggan", "value": "611981111"},
+                    {"name": "Jumlah Tagihan", "value": "1"},
+                    {"name": "Periode Bayar", "value": "Maret 2022"},
+                    {"name": "Total Tagihan", "value": "Rp 1.000"},
+                    {"name": "Biaya Admin", "value": "Rp 2.500"},
+                    {"name": "Total Bayar", "value": "Rp 3.500"},
+                ],
+                "partner_fee": 2000,
+                "product_code": "speedy-indihome",
+                "sales_price": 3500,
+                "serial_number": "174298636",
+                "status": "Success",
+                "voucher_code": "",
+            },
+        }
+    }
+
     make_httpserver.expect_request(
         CHECK_STATUS_PATH.format(request_id=random_string),
         headers={
@@ -110,42 +142,13 @@ def test_check_status_success(
             "authorization": "Bearer testingToken",
             "X-Sat-Sdk-Version": SDK_LABEL,
         },
-    ).respond_with_json(
-        response_json={
-            "data": {
-                "type": "order",
-                "id": random_string,
-                "attributes": {
-                    "admin_fee": 2500,
-                    "client_name": "Tokopedia User Default",
-                    "client_number": random_client_id,
-                    "error_code": "",
-                    "error_detail": "",
-                    "fields": None,
-                    "fulfilled_at": datetime.datetime.now(
-                        tz=datetime.timezone.utc
-                    ).isoformat(),
-                    "fulfillment_result": [
-                        {"name": "Nomor Referensi", "value": "174298636"},
-                        {"name": "Nama Pelanggan", "value": "Tokopedia User Default"},
-                        {"name": "Nomor Pelanggan", "value": "611981111"},
-                        {"name": "Jumlah Tagihan", "value": "1"},
-                        {"name": "Periode Bayar", "value": "Maret 2022"},
-                        {"name": "Total Tagihan", "value": "Rp 1.000"},
-                        {"name": "Biaya Admin", "value": "Rp 2.500"},
-                        {"name": "Total Bayar", "value": "Rp 3.500"},
-                    ],
-                    "partner_fee": 2000,
-                    "product_code": "speedy-indihome",
-                    "sales_price": 3500,
-                    "serial_number": "174298636",
-                    "status": "Success",
-                    "voucher_code": "",
-                },
-            }
-        },
+    ).respond_with_data(
+        response_data=json.dumps(body),
         status=200,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "signature": sat_signer.sign(json.dumps(body)),
+        },
     )
 
     times = 1
@@ -174,6 +177,7 @@ def test_check_status_success(
 def test_check_status_failed(
     make_httpserver: HTTPServer,
     sat_client: SATClient,
+    sat_signer: Signature,
     util: TestUtil,
 ):
     """
@@ -197,7 +201,6 @@ def test_check_status_failed(
     )
     body = generate_json_api_request(req.to_dict())
     body_str = json.dumps(body)
-    signature = sat_client.signature.sign(body_str)
 
     make_httpserver.expect_request(
         CHECKOUT_PATH,
@@ -241,8 +244,6 @@ def test_check_status_failed(
         headers={"Content-Type": "application/json"},
     )
 
-    assert sat_client.signature.verify(body_str, signature)
-
     response = sat_client.checkout(req)
 
     assert response.is_success()
@@ -259,6 +260,24 @@ def test_check_status_failed(
         id=random_string,
     )
 
+    body = {
+        "data": {
+            "type": "order",
+            "id": random_string,
+            "attributes": {
+                "client_number": "2121212",
+                "error_code": "S02",
+                "error_detail": "Product is not available",
+                "fields": [{"name": "optional", "value": "optional"}],
+                "fulfilled_at": None,
+                "partner_fee": 1000,
+                "product_code": "pln-postpaid",
+                "sales_price": 12500,
+                "serial_number": "",
+                "status": "Failed",
+            },
+        }
+    }
     make_httpserver.expect_request(
         CHECK_STATUS_PATH.format(request_id=random_string),
         method="GET",
@@ -267,27 +286,13 @@ def test_check_status_failed(
             "authorization": "Bearer testingToken",
             "X-Sat-Sdk-Version": SDK_LABEL,
         },
-    ).respond_with_json(
-        response_json={
-            "data": {
-                "type": "order",
-                "id": random_string,
-                "attributes": {
-                    "client_number": "2121212",
-                    "error_code": "S02",
-                    "error_detail": "Product is not available",
-                    "fields": [{"name": "optional", "value": "optional"}],
-                    "fulfilled_at": None,
-                    "partner_fee": 1000,
-                    "product_code": "pln-postpaid",
-                    "sales_price": 12500,
-                    "serial_number": "",
-                    "status": "Failed",
-                },
-            }
-        },
+    ).respond_with_data(
+        response_data=json.dumps(body),
         status=200,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "signature": sat_signer.sign(json.dumps(body)),
+        },
     )
 
     times = 1

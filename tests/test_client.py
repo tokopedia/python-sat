@@ -5,7 +5,7 @@ This example shows how to use the SATClient class.
 """
 
 import pytest
-from conftest import TESTING_PRIVATE_KEY
+from conftest import TESTING_CLIENT_PRIVATE_KEY
 
 from py_sat import SATClient, SATClientConfig
 from py_sat.exceptions import InvalidInputException
@@ -31,6 +31,7 @@ def test_sat_client_error_input():
             client_id="client_id",
             client_secret="client_secret",
             private_key=None,
+            sat_public_key=None,
         )
         http_client = SATClient(config)
 
@@ -44,8 +45,9 @@ def test_sat_client_error_padding_input():
         config = SATClientConfig(
             client_id="client_id",
             client_secret="client_secret",
-            private_key=TESTING_PRIVATE_KEY,
-        ).with_padding_type("test")
+            private_key=TESTING_CLIENT_PRIVATE_KEY,
+            sat_public_key="test",
+        )
         http_client = SATClient(config)
 
 
@@ -59,6 +61,7 @@ def test_sat_client_invalid_private_key():
             client_id="client_id",
             client_secret="client_secret",
             private_key="invalid_private_key",
+            sat_public_key="test",
         )
         _ = SATClient(config)
 
@@ -74,8 +77,9 @@ def test_sat_client_invalid_public_key():
         config = SATClientConfig(
             client_id="client_id",
             client_secret="client_secret",
-            private_key=TESTING_PRIVATE_KEY,
-        ).with_public_key("invalid_public_key")
+            private_key=TESTING_CLIENT_PRIVATE_KEY,
+            sat_public_key="invalid_public_key",
+        )
         _ = SATClient(config)
 
     assert "Invalid RSA public key" in str(exc_info.value)

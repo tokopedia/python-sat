@@ -53,11 +53,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     .with_is_debug(True)
 )
 
@@ -75,11 +74,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     # Override SAT Base URL
     .with_sat_base_url("https://b2b.tokopedia.com/api")
 )
@@ -113,11 +111,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     # Override SAT Base URL
     .with_sat_base_url("https://b2b.tokopedia.com/api")
 )
@@ -155,11 +152,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     # Override SAT Base URL
     .with_sat_base_url("https://b2b.tokopedia.com/api")
 )
@@ -201,11 +197,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     # Override SAT Base URL
     .with_sat_base_url("https://b2b.tokopedia.com/api")
 )
@@ -254,11 +249,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     # Override SAT Base URL
     .with_sat_base_url("https://b2b.tokopedia.com/api")
 )
@@ -275,11 +269,10 @@ config = (
         client_id="YOUR_CLIENT_ID", # required
         client_secret="YOUR_CLIENT_SECRET", # required
         private_key="YOUR_PRIVATE_KEY", # required
+        sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
     )
     # Below is optional parameter
     .with_timeout(10)
-    # Public key is optional, used only for callback signature verification
-    .with_public_key("SAT_PUBLIC_KEY")
     # Override SAT Base URL
     .with_sat_base_url("https://b2b.tokopedia.com/api")
 )
@@ -303,7 +296,8 @@ config = SATClientConfig(
     client_id="YOUR_CLIENT_ID",  # required
     client_secret="YOUR_CLIENT_SECRET",  # required
     private_key="YOUR_PRIVATE_KEY",  # required
-).with_public_key("SAT_PUBLIC_KEY")
+    sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
+)
 
 sat_client = SATClient(config)
 
@@ -354,7 +348,8 @@ config = SATClientConfig(
     client_id="YOUR_CLIENT_ID",  # required
     client_secret="YOUR_CLIENT_SECRET",  # required
     private_key="YOUR_PRIVATE",  # required
-).with_public_key("SAT_PUBLIC_KEY")
+    sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
+)
 
 sat_client = SATClient(config)
 
@@ -387,7 +382,8 @@ config = SATClientConfig(
     client_id="YOUR_CLIENT_ID",  # required
     client_secret="YOUR_CLIENT_SECRET",  # required
     private_key="YOUR_PRIVATE",  # required
-).with_public_key("SAT_PUBLIC_KEY")
+    sat_public_key="SAT_PUBLIC_KEY", # required !IMPORTANT: This is SAT public key, NOT your public key
+)
 
 try:
     sat_client = SATClient(config)

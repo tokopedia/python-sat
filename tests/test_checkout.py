@@ -87,8 +87,6 @@ def test_checkout(
         headers={"Content-Type": "application/json"},
     )
 
-    assert sat_client.signature.verify(body_str, signature)
-
     response = sat_client.checkout(req)
 
     assert response.to_json(indent=4)
@@ -159,8 +157,6 @@ def test_checkout_product_not_found(
         status=400,
         headers={"Content-Type": "application/json"},
     )
-
-    assert sat_client.signature.verify(body_str, signature)
 
     response = sat_client.checkout(req)
 
@@ -273,8 +269,6 @@ def test_checkout_duplicate_request_id(
         status=400,
         headers={"Content-Type": "application/json"},
     )
-
-    assert sat_client.signature.verify(body_str, signature)
 
     response = sat_client.checkout(req)
 
