@@ -24,14 +24,14 @@ class Signature:
     def __init__(
         self,
         private_key_str: Optional[str],
-        public_key_str: Optional[str],
+        sat_public_key_str: Optional[str],
         padding_type: SignatureType,
     ):
         if not padding_type:
             raise InvalidInputException("Padding type is required")
 
         self._private_key = self._parse_rsa_private_key_from_pem_str(private_key_str)
-        self._public_key = self._parse_public_key(public_key_str)
+        self._public_key = self._parse_public_key(sat_public_key_str)
         self._algorithm = self.__decide_padding_algorithm(padding_type)
 
     def verify(self, msg: str, signature: str) -> bool:

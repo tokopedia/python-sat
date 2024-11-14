@@ -34,9 +34,9 @@ class SATClientConfig:
     client_id: str
     client_secret: str
     private_key: str
+    sat_public_key: str
 
     # Optional
-    public_key: Optional[str]
     padding_type: SignatureType
     is_debug: bool
     sat_base_url: str
@@ -49,6 +49,7 @@ class SATClientConfig:
         client_id: str,
         client_secret: str,
         private_key: str,
+        sat_public_key: str,
     ):
         if not client_id or not isinstance(client_id, str):
             raise InvalidInputException("Client ID are required and must be a string")
@@ -61,9 +62,13 @@ class SATClientConfig:
         if not private_key or not isinstance(private_key, str):
             raise InvalidInputException("Private key is required and must be a string")
 
+        if not sat_public_key or not isinstance(sat_public_key, str):
+            raise InvalidInputException("Public key is required and must be a string")
+
         self.client_id = client_id
         self.client_secret = client_secret
         self.private_key = private_key
+        self.sat_public_key = sat_public_key
 
         self._set_default_value()
 
@@ -73,7 +78,6 @@ class SATClientConfig:
         logger.setLevel(logging.DEBUG)
         self.logger = logger
 
-        self.public_key = None
         self.padding_type = SignatureType.PSS
         self.is_debug = False
         self.sat_base_url = PLAYGROUND_SAT_BASE_URL
@@ -82,10 +86,6 @@ class SATClientConfig:
 
     def with_logger(self, logger: logging.Logger):
         self.logger = logger
-        return self
-
-    def with_public_key(self, public_key: str):
-        self.public_key = public_key
         return self
 
     def with_padding_type(self, padding_type: SignatureType):
@@ -122,7 +122,7 @@ class SATClient:
     def __init__(self, config: SATClientConfig):
         self._config = config
         self.signature = Signature(
-            config.private_key, config.public_key, config.padding_type
+            config.private_key, config.sat_public_key, config.padding_type
         )
         self._logger = config.logger
         self._http_client = HTTPClient(
@@ -235,7 +235,18 @@ class SATClient:
             response = self._http_client.send_request(http_req)
             response.raise_for_status()
 
+            signature = response.headers.get("signature")
+            if not signature:
+                raise UnauthenticatedException(
+                    "Signature is not present in the header, please check the request"
+                )
+
+            valid = self.signature.verify(response.text, signature)
+            if not valid:
+                raise UnauthenticatedException("Signature is not valid")
+
             json_response = response.json()
+
             data = parse_json_api_response(json_response)
 
             return OrderDetail.from_dict(data).with_raw_response(response)

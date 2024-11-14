@@ -7,8 +7,9 @@ For more information, please refer to "Signature" section in the SAT documentati
 """
 
 import pytest
+from conftest import TESTING_CLIENT_PRIVATE_KEY, TESTING_CLIENT_PUBLIC_KEY
 
-from py_sat import SATClient, SATClientConfig
+from py_sat.signature import Signature, SignatureType
 
 
 @pytest.mark.parametrize(
@@ -28,7 +29,7 @@ from py_sat import SATClient, SATClientConfig
         ),
     ],
 )
-def test_signature(test_input, test_message, verified, sat_client: SATClient):
+def test_signature(test_input, test_message, verified):
     """
     Test signature module.
 
@@ -37,8 +38,14 @@ def test_signature(test_input, test_message, verified, sat_client: SATClient):
     :param verified:
     :param sat_client:
     """
-    signature = sat_client.signature.sign(test_input)
-    assert signature
+    signature = Signature(
+        private_key_str=TESTING_CLIENT_PRIVATE_KEY,
+        sat_public_key_str=TESTING_CLIENT_PUBLIC_KEY,
+        padding_type=SignatureType.PSS,
+    )
 
-    is_verified = sat_client.signature.verify(test_message, signature)
+    sig = signature.sign(test_input)
+    assert sig
+
+    is_verified = signature.verify(test_message, sig)
     assert verified == is_verified

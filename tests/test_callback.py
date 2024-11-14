@@ -19,14 +19,20 @@ from pytest_httpserver import HTTPServer
 from werkzeug.wrappers import Request, Response
 
 from py_sat import SATClient
+from py_sat.client import SATClientConfig
 from py_sat.models import OrderDetail
+from py_sat.signature import Signature, SignatureType
 from py_sat.utils import parse_json_api_response
 
 
-def test_callback(make_httpserver: HTTPServer, sat_client: SATClient):
+def test_callback(
+    make_httpserver: HTTPServer, local_config: SATClientConfig, sat_signer: Signature
+):
     """
     Example of how to handle the callback from SAT using SAT Python SDK
     """
+
+    sat_client = SATClient(local_config)
     make_httpserver.expect_request(
         "/callback",
         method="POST",
@@ -58,10 +64,11 @@ def test_callback(make_httpserver: HTTPServer, sat_client: SATClient):
             },
         }
     }
-    signature = sat_client.signature.sign(json.dumps(body))
+
+    sig = sat_signer.sign(json.dumps(body))
     headers = {
         "content-type": "application/vnd.api+json",
-        "signature": signature,
+        "signature": sig,
     }
     response = requests.post(
         make_httpserver.url_for("/callback"),
@@ -77,6 +84,9 @@ def create_handler(sat_client: SATClient):
     def handler(request: Request) -> Response:
         try:
             data = request.json
+            if data is None:
+                raise Exception("data is None")
+
             headers = dict(request.headers)
 
             def do_action(order_detail: OrderDetail):
@@ -110,11 +120,15 @@ def create_handler(sat_client: SATClient):
     return handler
 
 
-def test_callback_signature(make_httpserver: HTTPServer, sat_client: SATClient):
+def test_callback_signature(
+    make_httpserver: HTTPServer, local_config: SATClientConfig, sat_signer: Signature
+):
     """
     Example of how to handle the callback from SAT without using SATClient handle_callback function
     but only using the signature verification
     """
+
+    sat_client = SATClient(local_config)
     make_httpserver.expect_request(
         "/callback",
         method="POST",
@@ -146,7 +160,7 @@ def test_callback_signature(make_httpserver: HTTPServer, sat_client: SATClient):
             },
         }
     }
-    signature = sat_client.signature.sign(json.dumps(body))
+    signature = sat_signer.sign(json.dumps(body))
     headers = {
         "content-type": "application/vnd.api+json",
         "signature": signature,
