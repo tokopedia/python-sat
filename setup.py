@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 setup(
     name="py_sat_sdk",
     packages=find_packages(),
-    version="1.0.7",
+    version="1.0.8",
     description="Python SDK for Tokopedia SAT API",
     author="SAT Team",
     install_requires=[
